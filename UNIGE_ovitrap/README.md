@@ -7,6 +7,7 @@ How to access Google Earth Engine (GEE) data?
 3. Read the API docs: https://developers.google.com/earth-engine
 
 data can be visualized and downloaded to Google Drive using the code editor: https://code.earthengine.google.com/
+
 I find it quite cumbersome, so I wrote some code in Python that allows for more flexibility.
 If you want to use it as well, follow these steps: 
 
