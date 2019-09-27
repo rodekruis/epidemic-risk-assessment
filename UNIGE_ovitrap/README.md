@@ -1,10 +1,15 @@
 # ACCESS GOOGLE EARTH ENGINE DATA
 
-docs and scripts to download Google Earth Engine (GEE) data.
+How to access Google Earth Engine (GEE) data?
 
 1. Subscribe to GEE: https://signup.earthengine.google.com
 2. Explore available datasets: https://developers.google.com/earth-engine/datasets/
 3. Read the API docs: https://developers.google.com/earth-engine
+
+data can be visualized and downloaded to Google Drive using the code editor: https://code.earthengine.google.com/
+I find it quite cumbersome, so I wrote some code in Python that allows for more flexibility.
+If you want to use it as well, follow these steps: 
+
 4. Install Python 3.7.4, if you don't have it already: https://www.python.org/downloads/
 5. Install the GEE Python API (and required auxiliary software): https://developers.google.com/earth-engine/python_install
 6. Install geetools: https://pypi.org/project/geetools/
