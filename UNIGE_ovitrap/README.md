@@ -1,4 +1,4 @@
-# ACCESS GOOGLE EARTH ENGINE DATA
+## ACCESS GOOGLE EARTH ENGINE DATA
 
 How to access Google Earth Engine (GEE) data?
 
