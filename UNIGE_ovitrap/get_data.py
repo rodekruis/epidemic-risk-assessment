@@ -2,7 +2,7 @@
 This is a simple script to access, aggregate and download a series of raster files from Google Earth Engine.
 The data source is the GSMaP dataset.
 This script gets GSMaP data on rainfall within the Philippines and sum all values within a month, i.e. it
-computes the monthly cumulative rainfall, expressed in mm/h.
+computes the monthly cumulative rainfall, expressed in mm.
 Author: Jacopo Margutti (jmargutti@redcross.nl)
 Date: 27-09-2019
 """
