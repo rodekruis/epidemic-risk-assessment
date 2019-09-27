@@ -22,8 +22,8 @@ pip install geetools
 python get_data.py
 ```
 
-that's it! you should see images appearing in the directory where 'get_data.py' is running.
-to get all needed data, you need to change the script accordingly; see the comment lines in the code to understand what needs to be changed.
+That's it! you should see images appearing in the directory where 'get_data.py' is running.
+To get all needed data, you need to change the script accordingly; see the comment lines in the code to understand what needs to be changed.
 #### N.B. different datasets have different date ranges, spatial/temporal resolution and variable names, check carefully the datasets descriptions at https://developers.google.com/earth-engine/datasets/
 
 in case of doubts, drop me (Jacopo Margutti) a message at jmargutti@redcross.nl
