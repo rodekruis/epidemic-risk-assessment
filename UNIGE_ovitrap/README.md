@@ -1,4 +1,4 @@
-## ACCESS GOOGLE EARTH ENGINE DATA
+## ACCESS GOOGLE EARTH ENGINE
 
 How to access Google Earth Engine (GEE) data?
 
@@ -6,9 +6,15 @@ How to access Google Earth Engine (GEE) data?
 2. Explore available datasets: https://developers.google.com/earth-engine/datasets/
 3. Read the API docs: https://developers.google.com/earth-engine
 
-data can be visualized and downloaded to Google Drive using the code editor: https://code.earthengine.google.com/
+## VISUALIZE AND DOWNLOAD DATA
 
-I find it quite cumbersome, so I wrote some code in Python that allows for more flexibility.
+There are 3 options:
+
+#### 1. GEE Code Editor
+1. Using the code editor: https://code.earthengine.google.com/
+
+#### 2. Python API
+I find the GEE code editor quite cumbersome, so I wrote some code in Python that allows for more flexibility.
 If you want to use it as well, follow these steps: 
 
 4. Install Python 3.7.4, if you don't have it already: https://www.python.org/downloads/
@@ -21,9 +27,14 @@ pip install geetools
 ```python
 python get_data.py
 ```
-
 That's it! you should see images appearing in the directory where 'get_data.py' is running.
 To get all needed data, you need to change the script accordingly; see the comment lines in the code to understand what needs to be changed.
+
+#### 3. QGIS plugin
+There's a QGIS plugin for GEE. I haven't tested it and it seems to be still under development, but it might be worth to try:
+https://github.com/gee-community/qgis-earthengine-plugin
+Thanks Fleur Hierink for pointing that out!
+
 #### N.B. different datasets have different date ranges, spatial/temporal resolution and variable names, check carefully the datasets descriptions at https://developers.google.com/earth-engine/datasets/
 
 in case of doubts, drop me (Jacopo Margutti) a message at jmargutti@redcross.nl
