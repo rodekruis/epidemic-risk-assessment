@@ -9,7 +9,8 @@
 There are 3 options:
 
 #### 1. GEE Code Editor
-1. Using the code editor: https://code.earthengine.google.com/
+Use the code editor: https://code.earthengine.google.com/
+Commands are in JavaScript, see documentation here: https://developers.google.com/earth-engine/playground
 
 #### 2. Python API
 I find the GEE code editor quite cumbersome, so I wrote some code in Python that allows for more flexibility.
@@ -29,7 +30,7 @@ That's it! you should see images appearing in the directory where 'get_data.py' 
 To get all needed data, you need to change the script accordingly; see the comment lines in the code to understand what needs to be changed.
 
 #### 3. QGIS plugin
-There's a QGIS plugin for GEE. I haven't tested it and it seems to be still under development, but it might be worth to try:
+There's also a QGIS plugin for GEE. I haven't tested it and it seems to be still under development, but it might be worth to try:
 https://github.com/gee-community/qgis-earthengine-plugin
 Thanks Fleur Hierink for pointing that out!
 
