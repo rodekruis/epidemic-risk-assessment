@@ -9,7 +9,8 @@
 There are 3 options:
 
 #### 1. GEE Code Editor
-Use the code editor: https://code.earthengine.google.com/
+Use the code editor: https://code.earthengine.google.com/ 
+
 Commands are in JavaScript, see documentation here: https://developers.google.com/earth-engine/playground
 
 #### 2. Python API
