@@ -20,10 +20,12 @@ If you want to use it as well, follow these steps:
 4. Install Python 3.7.4, if you don't have it already: https://www.python.org/downloads/
 5. Install the GEE Python API (and required auxiliary software): https://developers.google.com/earth-engine/python_install
 6. Install geetools: https://pypi.org/project/geetools/
+From the Anaconda Prompt (Windows) or any terminal (Linux/MacOS), type
 ```python
 pip install geetools
 ```
-7. Execute the python script 'get_data.py'. In Linux/MacOS:
+7. Execute the python script 'get_data.py'.
+From the Anaconda Prompt (Windows) or any terminal (Linux/MacOS), type
 ```python
 python get_data.py
 ```
