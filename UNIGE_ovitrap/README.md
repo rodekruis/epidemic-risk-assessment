@@ -1,7 +1,5 @@
 ## ACCESS GOOGLE EARTH ENGINE
 
-How to access Google Earth Engine (GEE) data?
-
 1. Subscribe to GEE: https://signup.earthengine.google.com
 2. Explore available datasets: https://developers.google.com/earth-engine/datasets/
 3. Read the API docs: https://developers.google.com/earth-engine
