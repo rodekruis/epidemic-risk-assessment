@@ -32,7 +32,7 @@ That's it! you should see images appearing in the directory where 'get_data.py' 
 To get all needed data, you need to change the script accordingly; see the comment lines in the code to understand what needs to be changed.
 
 #### 3. QGIS plugin
-There's also a QGIS plugin for GEE. I haven't tested it and it seems to be still under development, but it might be worth to try: <br/>
+There's also a QGIS plugin for GEE. I haven't tested it and it seems to be still under development, but it might be worth to try: 
 https://github.com/gee-community/qgis-earthengine-plugin <br/>
 Thanks Fleur Hierink for pointing that out!
 
