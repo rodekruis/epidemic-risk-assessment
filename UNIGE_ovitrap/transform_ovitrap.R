@@ -13,7 +13,7 @@ ovitrap <- read.csv("/Users/...../....csv")
 ovitrap$date <- as.Date(ovitrap$date)
 
 #create bi-weekly averages
-ovitrap_week <- oviphildat %>%
+ovitrap_week <- ovitrap %>%
   mutate(two_weeks = round_date(date, "14 days")) %>%
   group_by(id, longitude, latitude, two_weeks) %>%
   summarise(average_ovi = mean(value)) 
