@@ -18,5 +18,11 @@ ovitrap_week <- ovitrap %>%
   group_by(id, longitude, latitude, two_weeks) %>%
   summarise(average_ovi = mean(value)) 
 
+#2014 is data richest year, subset 2014 and continue with this
+ovitrap_2014 <- ovitrap_week %>%
+  mutate(two_weeks = as.Date(two_weeks)) %>%
+  filter(two_weeks >= "2014-01-2014" & two_weeks <= "2014-12-31")
+
 #save data as csv
-write.csv("/Users/.../...csv")
+write.csv(ovitrap_week, "/Users/.../...csv")
+write.csv(ovitrap_2014, "/Users/.../...csv")
