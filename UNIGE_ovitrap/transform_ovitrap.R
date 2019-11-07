@@ -21,7 +21,7 @@ ovitrap_week <- ovitrap %>%
 #2014 is data richest year, subset 2014 and continue with this
 ovitrap_2014 <- ovitrap_week %>%
   mutate(two_weeks = as.Date(two_weeks)) %>%
-  filter(two_weeks >= "2014-01-2014" & two_weeks <= "2014-12-31")
+  filter(two_weeks >= "2014-01-01" & two_weeks <= "2014-12-31")
 
 #save data as csv
 write.csv(ovitrap_week, "/Users/.../...csv")
