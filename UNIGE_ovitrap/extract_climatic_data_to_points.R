@@ -43,7 +43,7 @@ precip.names <- paste0(primary.folder.precip, "/", sub.folder.precip, ".tif")
 
 # final step to rename all documents
 # rename all files to date column
-file.rename(from = precip.layers, to = precip.names)
+file.rename(from = precip.layers, to = precip.names) # all layers are renamed!
 
 # Now move to creation of dataset containing all climatic data per ovitrap location
 
@@ -62,7 +62,7 @@ length(grids) # is 20 which is correct
 # create a raster stack of the rasters in grids
 # ideally these rasters are named after their respective dates
 # because column that is created has name of raster
-s <- stack(paste0("/Users/fleurhierink/Dropbox/student data geomatics/Climatic data/data_biweekly/JAXA_GPM_L3_GSMaP_v6_operational_hourlyPrecipRate/", grids))
+s <- stack(paste0("..../Climatic data/data_biweekly/JAXA_GPM_L3_GSMaP_v6_operational_hourlyPrecipRate/", grids))
 
 # third
 # extract raster values for each unique ovitrap point
@@ -70,7 +70,7 @@ s <- stack(paste0("/Users/fleurhierink/Dropbox/student data geomatics/Climatic d
 ovipoints.unique <- ovipoints %>%
   distinct(id)
 
-ovistack <- raster::extract(s, ovipoints.unique, sp = TRUE) # works fine, all layers renamed!
+ovistack <- raster::extract(s, ovipoints.unique, sp = TRUE) # works fine!
 
 # isolate the variable name, in this case JAXA..
 # and transform data to long format
