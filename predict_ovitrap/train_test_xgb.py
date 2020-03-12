@@ -5,7 +5,9 @@ import xgboost as xgb
 from sklearn.metrics import mean_squared_error, mean_absolute_error, explained_variance_score, r2_score
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
-
+from sklearn.model_selection import GridSearchCV
+import numpy as np
+import matplotlib.pyplot as plt
 
 def train_test_xgb(dataset='data/dataset_for_analysis.csv',
                    finetuning=False):
@@ -69,94 +71,83 @@ def train_test_xgb(dataset='data/dataset_for_analysis.csv',
 
     if finetuning:
         # define training data
-        X_train, X_test, y_train, y_test = train_test_split(df[X_labels], df[y_label], test_size=0.1)
-        dtrain = xgb.DMatrix(X_train, label=y_train)
+        dtrain = xgb.DMatrix(data=df[X_labels], label=df[y_label])
         # define grid of possible hyper-parameter values
         gridsearch_params = [
-            (max_depth, learning_rate, n_estimators)
-            for max_depth in range(1, 10)
-            for learning_rate in [0.05, 0.1, 0.2]
-            for n_estimators in range(100, 100, 100)
+            {'max_depth': max_depth,
+             'learning_rate': learning_rate,
+             'n_estimators': n_estimators,
+             'min_split_loss': min_split_loss,
+             'subsample': subsample,
+             'colsample_bytree': colsample_bytree,
+             'reg_lambda': reg_lambda,
+             'reg_alpha': reg_alpha,
+             'booster': booster}
+            for max_depth in [2, 5, 10, 20]
+            for learning_rate in [0.05, 0.1]
+            for n_estimators in [1000, 2000, 5000]
+            for min_split_loss in [0., 0.1, 1.]
+            for subsample in [0.5, 0.8, 1.]
+            for colsample_bytree in [0.3, 0.6, 1.]
+            for reg_lambda in [1, 1.5, 2]
+            for reg_alpha in [0., 0.1, 1.]
+            for booster in ['gbtree']
         ]
-        # names of hyper-parameters that we are going to tune
-        param_names = ['max_depth', 'learning_rate', 'n_estimators']
-        # initial hyper-parameters
+        # fixed hyper-parameters
         params = {
-            'max_depth': 6,
-            'min_child_weight': 7,
-            'n_estimators': 1000,
-            'eta': .3,
-            'subsample': 1,
-            'colsample_bytree': 1,
-            'subsample_bytree': 0.8,
             'objective': 'reg:squarederror',
             'eval_metric': 'rmse',
-            'booster': 'gbtree'
+            'booster': 'gbtree',
+            'num_boost_round': 1000
         }
         # loop over grid, find best hyper-parameters
         min_rmse = float("Inf")
         best_params = None
         for params_grid in tqdm(gridsearch_params):
-            # Update our parameters
-            for name, value in zip(param_names, params_grid):
+            # Update parameters
+            for name, value in params_grid.items():
                 params[name] = value
-            n_rounds = int(2000/(params['learning_rate']/0.05))
             # Run CV
-            cv_results = xgb.cv(
-                params,
-                dtrain,
-                num_boost_round=n_rounds,
-                seed=42,
-                nfold=5
-            )
-            # Update best RMSE
+            cv_results = xgb.cv(dtrain=dtrain, params=params, num_boost_round=params['num_boost_round'],
+                                early_stopping_rounds=50, seed=42, nfold=5, as_pandas=True)
+            # Update best MAE
             mean_rmse = cv_results['test-rmse-mean'].min()
-            boost_rounds = cv_results['test-rmse-mean'].values.argmin()
-            print("\trmse {} for {} rounds".format(mean_rmse, boost_rounds))
+            boost_rounds = cv_results['test-rmse-mean'].values.argmin()+1
+            print("\trmse {} for {} / {} rounds".format(mean_rmse, boost_rounds, len(cv_results)))
             if mean_rmse < min_rmse:
                 min_rmse = mean_rmse
                 best_params = params
         # print results
-        print('params:', param_names)
-        print("best params: {}, rmse: {}".format(best_params, min_rmse))
+        print("best params: {}".format(best_params))
+        print("min rmse: {}".format(min_rmse))
     else:
         # used fixed hyper-parameters
-        best_params = {'max_depth': 9, 'min_child_weight': 7, 'n_estimators': 1000, 'eta': 0.3, 'subsample': 1,
-                       'colsample_bytree': 1, 'subsample_bytree': 0.8, 'objective': 'reg:squarederror',
-                       'eval_metric': 'rmse', 'booster': 'gbtree', 'learning_rate': 0.2}
+        best_params = {'objective': 'reg:squarederror', 'eval_metric': 'rmse', 'booster': 'gbtree',
+                       'num_boost_round': 1000, 'max_depth': 20, 'learning_rate': 0.2,
+                       'n_estimators': 5000, 'subsample': 1.0, 'colsample_bytree': 1.0,
+                        'reg_lambda': 2, 'reg_alpha': 1.0, 'min_split_loss': 0.}
+
 
     # 3) train and test model, save CV-scores
 
-    # initialize performance metrics & feature importance
-    mae, mse, evs, r2s = 0., 0., 0., 0.
-    feature_importances_sum = [0. for i in range(len(X_labels))]
-    # define number of folds in cross-validation
-    n_folds = 10
-
-    # for each fold: random split dataset, train and test xgb model
-    for i in tqdm(range(n_folds)):
-        X_train, X_test, y_train, y_test = train_test_split(df[X_labels], df[y_label], test_size=0.1)
-        xg_reg = xgb.XGBRegressor(**best_params)
-        xg_reg.fit(X_train, y_train)
-        y_pred = xg_reg.predict(X_test)
-        mae += mean_absolute_error(y_test, y_pred)
-        mse += mean_squared_error(y_test, y_pred)
-        evs += explained_variance_score(y_test, y_pred)
-        r2s += r2_score(y_test, y_pred)
-        for i, fi in enumerate(xg_reg.feature_importances_):
-            feature_importances_sum[i] += fi
+    nfolds = 5
+    X, y = df[X_labels], df[y_label]
+    dmdata = xgb.DMatrix(data=X, label=y)
+    cv_results = xgb.cv(dtrain=dmdata, params=best_params, nfold=nfolds, metrics=["rmse", "mae"],
+                        num_boost_round=best_params['num_boost_round'], early_stopping_rounds=50,
+                        as_pandas=True, seed=42)
+    boost_rounds = len(cv_results)
 
     # 4) print scores and feature importance
 
     # print average performance & feature importance
-    print("cv-performance: MAE {}, MSE {}, EVS {}, R2S {}".format(mae/n_folds, mse/n_folds, evs/n_folds, r2s/n_folds))
+    print("cv-performance: MAE {}, RMSE {}".format(cv_results["test-mae-mean"].tail(1).values[0],
+                                                   cv_results["test-rmse-mean"].tail(1).values[0]))
 
-    feature_importances = sorted(zip(X_labels, [f/n_folds for f in feature_importances_sum]),
-                                 key=lambda t: t[1], reverse=True)
-    print("best 10 features:")
-    for name, importance in feature_importances[:10]:
-        print(name, importance)
-
+    xg_reg = xgb.train(dtrain=dmdata, params=best_params, num_boost_round=boost_rounds)
+    xgb.plot_importance(xg_reg)
+    plt.tight_layout()
+    plt.show()
 
 if __name__ == "__main__":
     train_test_xgb()
