@@ -1,5 +1,5 @@
 import pandas as pd
-from prepare_dataset import prepare_dataset_for_training
+from utils import prepare_dataset_for_training, inverse_transform
 import os
 import xgboost as xgb
 from sklearn.metrics import mean_squared_error, mean_absolute_error, explained_variance_score, r2_score
@@ -9,8 +9,9 @@ from sklearn.model_selection import GridSearchCV
 import numpy as np
 import matplotlib.pyplot as plt
 
-def train_test_xgb(dataset='data/dataset_for_analysis.csv',
-                   finetuning=False):
+def train_test_xgb(dataset='data/dataset_for_analysis_test.csv',
+                   finetuning=False,
+                   force_data_prep=True):
     """ train and test a xgb model
     1) define target and predictors, prepare dataset
     2) OPTIONAL: hyper-parameter tuning
@@ -20,10 +21,14 @@ def train_test_xgb(dataset='data/dataset_for_analysis.csv',
 
     # 1) define target and predictors, prepare dataset
 
+    # notes: fucking FLDAS updates after 2 months
+    # alternatives
+    # precipitation: NASA/GPM_L3/IMERG_V06
+
     # define labeld of predictors and target
     X_labels_base = ['MODIS_006_MOD11A1_LST_Day_1km',
                      'MODIS_006_MOD11A1_LST_Night_1km',
-                     'MODIS_006_MYD13A1_EVI',
+                     # 'MODIS_006_MYD13A1_EVI',
                      'NASA_FLDAS_NOAH01_C_GL_M_V001_Qair_f_tavg',
                      'NASA_FLDAS_NOAH01_C_GL_M_V001_Rainf_f_tavg',
                      'NASA_FLDAS_NOAH01_C_GL_M_V001_SoilMoi00_10cm_tavg',
@@ -40,7 +45,7 @@ def train_test_xgb(dataset='data/dataset_for_analysis.csv',
         X_labels += [x + '_' + str(ts) for x in X_labels_base]
 
     # prepare dataset
-    if not os.path.exists(dataset):
+    if not os.path.exists(dataset) or force_data_prep:
         print('dataset not found, preparing from raw data (this might take a wile)')
         # define input data path
         ovitrap_data = 'data/ovitrap_data_month_adm2.csv'
@@ -84,7 +89,7 @@ def train_test_xgb(dataset='data/dataset_for_analysis.csv',
              'reg_alpha': reg_alpha,
              'booster': booster}
             for max_depth in [2, 5, 10, 20]
-            for learning_rate in [0.05, 0.1]
+            for learning_rate in [0.05, 0.1, 0.2]
             for n_estimators in [1000, 2000, 5000]
             for min_split_loss in [0., 0.1, 1.]
             for subsample in [0.5, 0.8, 1.]
@@ -145,6 +150,20 @@ def train_test_xgb(dataset='data/dataset_for_analysis.csv',
                                                    cv_results["test-rmse-mean"].tail(1).values[0]))
 
     xg_reg = xgb.train(dtrain=dmdata, params=best_params, num_boost_round=boost_rounds)
+
+    dpredict = xgb.DMatrix(data=df_uncut[X_labels], label=df_uncut[y_label])
+    predictions = xg_reg.predict(dpredict)
+    df_pred = df_uncut.copy()
+    df_pred[y_label] = predictions
+    df_pred = inverse_transform(df_pred, dataset, [y_label] + X_labels)
+    df_pred.to_csv('output/dataset_predictions.csv')
+    xg_reg.save_model('models/best_model.json')
+
+    df_uncut = df_uncut.dropna(subset=[y_label])
+    dpredict = xgb.DMatrix(data=df_uncut[X_labels], label=df_uncut[y_label])
+    predictions = xg_reg.predict(dpredict)
+    print('R2 train', r2_score(df_uncut[y_label].values, predictions))
+
     xgb.plot_importance(xg_reg)
     plt.tight_layout()
     plt.show()

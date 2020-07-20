@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 import dateutil.relativedelta
 import numpy as np
-from sklearn.externals import joblib
+import joblib
 
 
 def normalize_features(df, feature_names):
@@ -52,7 +52,6 @@ def prepare_dataset_for_training(ovitrap_data,
     y_label = ['mean_ovi']
     X_labels = which_weather_data
     dataset.loc[(dataset['mean_ovi'] < 0.) & (dataset['mean_ovi'] > 100.), 'mean_ovi'] = np.nan
-    dataset, scaler = normalize_features(dataset, y_label + X_labels)
 
     # 3) create a dataframe with predictors at different previous time steps
 
@@ -82,8 +81,13 @@ def prepare_dataset_for_training(ovitrap_data,
         df_final.at[(row['adm_level'], date_start), 'mean_ovi'] = row['mean_ovi']
         df_final.at[(row['adm_level'], date_start), 'count_ovi'] = row['count_ovi']
 
-    # 4) save final dataframe and normalization scheme (scaler)
+    # 4) normalize, save final dataframe and scaler
 
+    # normalize
+    all_labels = y_label
+    for ts in range(n_time_steps):
+        all_labels = all_labels + X_labels_time[ts]
+    df_final, scaler = normalize_features(df_final, all_labels)
     # save final dataframe
     df_final.to_csv(filename)
     # save scaler (normalization scheme)
